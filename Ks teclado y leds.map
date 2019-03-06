@@ -1,0 +1,60 @@
+MPLINK 4.47, Linker
+Linker Map File - Created Mon May 13 17:46:29 2013
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000010    program   0x0001e0
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000010    0x0000ff      
+            241 out of 8455 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          BARRIDO_DISPLAY   0x000030    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY2   0x00003b    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY3   0x000042    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY4   0x000049    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY5   0x000050    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY6   0x000057    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+             FIN_PREGUNTA   0x0000c3    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                   INICIO   0x000010    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                    PASO2   0x00005f    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                    PAUSA   0x00006f    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                  RETARDO   0x0000ee    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+        SIGUIENTE_DISPLAY   0x000059    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+            TABLA_DIGITOS   0x0000dc    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+         TABLA_POSICIONES   0x0000d2    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   INICIO   0x000010    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+          BARRIDO_DISPLAY   0x000030    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY2   0x00003b    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY3   0x000042    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY4   0x000049    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY5   0x000050    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                 DISPLAY6   0x000057    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+        SIGUIENTE_DISPLAY   0x000059    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                    PASO2   0x00005f    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                    PAUSA   0x00006f    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+             FIN_PREGUNTA   0x0000c3    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+         TABLA_POSICIONES   0x0000d2    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+            TABLA_DIGITOS   0x0000dc    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+                  RETARDO   0x0000ee    program     static C:\Users\Kevin Shanta\Desktop\ESTATAL\Sexto Ciclo\Microporcesadores 1\MPLAB\ks teclado y leds\Ks teclado y leds.asm
+
+

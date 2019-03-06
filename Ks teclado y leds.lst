@@ -1,0 +1,1143 @@
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 
+                      00002                                 LIST P=16F887
+                      00003                                 INCLUDE <p16f887.inc>
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F887 processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00809         LIST
+                      00004 ;Declaracion variables
+  00000020            00005 tecla                                           EQU 0x20
+  00000021            00006 num_tecla                                       EQU 0x21
+  00000022            00007 barrido_display                         EQU 0x22
+                      00008 ;auxiliar                                       EQU 0x23
+  00000024            00009 ayuda                                           EQU 0x24
+  00000025            00010 cont1_pausa                                     EQU 0x25
+  00000026            00011 cont2_pausa                                     EQU 0X26
+  00000027            00012 cont3_pausa                                     EQU 0X27
+  00000028            00013 contador_barrido_display        EQU 0x28
+  00000029            00014 display1                                        EQU 0x29
+  0000002A            00015 display2                                        EQU 0x2A
+  0000002B            00016 display3                                        EQU 0x2B
+  0000002C            00017 display4                                        EQU 0x2C
+  0000002D            00018 display5                                        EQU 0x2D
+  0000002F            00019 display6                                        EQU 0x2F
+                      00020 
+                      00021 
+                      00022 
+Warning[205]: Found directive in column 1. (ORG)
+0000                  00023 ORG 0X00
+Warning[203]: Found opcode in column 1. (goto)
+0000   2810           00024 goto INICIO
+                      00025 
+Warning[205]: Found directive in column 1. (ORG)
+0010                  00026 ORG 0x10
+                      00027 
+0010                  00028 INICIO:
+                      00029         ;inicializo variable barrido y num_tecla
+0010   01A8           00030         clrf contador_barrido_display
+0011   01A2           00031         clrf barrido_display
+0012   01A1           00032         clrf num_tecla
+0013   01A4           00033         clrf ayuda
+0014   01A5           00034         clrf cont1_pausa
+0015   01A6           00035         clrf cont2_pausa
+0016   3001           00036         movlw 0x01
+0017   00A7           00037         movwf cont3_pausa
+                      00038 ;       clrf auxiliar   
+                      00039 
+                      00040         ;Banco 3
+0018   1683           00041         bsf STATUS,RP0
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0019   1703           00042         bsf STATUS,RP1
+                      00043 
+                      00044         ;Valores digitales Puerto B
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001A   0189           00045         clrf ANSELH             
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001B   1381           00046         bcf OPTION_REG,NOT_RBPU
+                      00047 
+                      00048         ;Banco 2
+001C   1303           00049         bcf STATUS,RP1
+001D   1683           00050         bsf STATUS,RP0
+                      00051 
+                      00052         ;Mitad entradas(1) mitad salidas(0)
+001E   30F0           00053         movlw 0xF0
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001F   0086           00054         movwf TRISB
+                      00055 
+                      00056         ;Salidas puerto C puerto D
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0020   0187           00057         clrf TRISC
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0021   0188           00058         clrf TRISD
+                      00059 
+                      00060         ;Banco 0
+0022   1283           00061         bcf STATUS,RP0
+0023   1303           00062         bcf STATUS,RP1
+                      00063 
+                      00064         ;PORT B mitad en alto(entradas) y mitad el bajo(salidas)
+0024   30F0           00065         movlw 0xF0
+0025   0086           00066         movwf PORTB
+                      00067 
+                      00068         ;En bajo puerto C y con el contador puerto D
+0026   0187           00069         clrf PORTC
+0027   30FF           00070         movlw 0xFF
+0028   0087           00071         movwf PORTC
+0029   00A9           00072         movwf display1
+002A   00AA           00073         movwf display2
+002B   00AB           00074         movwf display3
+002C   00AC           00075         movwf display4
+002D   00AD           00076         movwf display5
+002E   00AF           00077         movwf display6
+002F   0188           00078         clrf PORTD
+                      00079 
+                      00080 
+0030                  00081 BARRIDO_DISPLAY:
+0030   01A1           00082                 clrf num_tecla
+0031   20D2           00083                 call TABLA_POSICIONES
+0032   00A2           00084                 movwf barrido_display
+0033   0088           00085                 movwf PORTD             
+                      00086                 
+                      00087                 ;si es el display1
+0034   3000           00088                 movlw 0x00
+0035   0628           00089                 xorwf contador_barrido_display,W
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0036   1D03           00090                 btfss STATUS,Z
+0037   283B           00091                 goto DISPLAY2
+0038   0829           00092                 movfw display1
+0039   0087           00093                 movwf PORTC
+003A   2859           00094                 goto SIGUIENTE_DISPLAY
+                      00095 
+                      00096 
+003B                  00097 DISPLAY2:               
+                      00098                 ;si es el display2
+003B   3001           00099                 movlw 0x01
+003C   0628           00100                 xorwf contador_barrido_display,W
+003D   1D03           00101                 btfss STATUS,Z
+003E   2842           00102                 goto DISPLAY3
+003F   082A           00103                 movfw display2
+0040   0087           00104                 movwf PORTC
+0041   2859           00105                 goto SIGUIENTE_DISPLAY
+                      00106 
+0042                  00107 DISPLAY3:
+                      00108                 ;si es el display3
+0042   3002           00109                 movlw 0x02
+0043   0628           00110                 xorwf contador_barrido_display,W
+0044   1D03           00111                 btfss STATUS,Z
+0045   2849           00112                 goto DISPLAY4
+0046   082B           00113                 movfw display3
+0047   0087           00114                 movwf PORTC
+0048   2859           00115                 goto SIGUIENTE_DISPLAY
+                      00116 
+0049                  00117 DISPLAY4:
+                      00118                 ;si es el display4
+0049   3003           00119                 movlw 0x03
+004A   0628           00120                 xorwf contador_barrido_display,W
+004B   1D03           00121                 btfss STATUS,Z
+004C   2850           00122                 goto DISPLAY5
+004D   082C           00123                 movfw display4
+004E   0087           00124                 movwf PORTC
+004F   2859           00125                 goto SIGUIENTE_DISPLAY
+                      00126 
+0050                  00127 DISPLAY5
+                      00128                 ;si es el display5
+0050   3004           00129                 movlw 0x04
+0051   0628           00130                 xorwf contador_barrido_display,W
+0052   1D03           00131                 btfss STATUS,Z
+0053   2857           00132                 goto DISPLAY6
+0054   082D           00133                 movfw display5
+0055   0087           00134                 movwf PORTC
+0056   2859           00135                 goto SIGUIENTE_DISPLAY
+                      00136 
+0057                  00137 DISPLAY6
+                      00138                 ;si es el display6
+0057   082F           00139                 movfw display6
+0058   0087           00140                 movwf PORTC
+                      00141 
+                      00142 
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0059                  00143 SIGUIENTE_DISPLAY
+0059   0AA8           00144                 incf contador_barrido_display,F 
+                      00145                 
+                      00146 
+                      00147                 ;comparo si no a cambiado, es decir sigue siendo 0xF0
+005A   30F0           00148                 movlw 0xF0
+005B   0606           00149                 xorwf PORTB,W
+005C   1D03           00150                 btfss STATUS,Z
+005D   285F           00151                 goto PASO2
+005E   28EE           00152                 goto RETARDO
+                      00153 
+005F                  00154 PASO2:
+                      00155                 ;saco los valores de PORTB a tecla
+005F   00A0           00156                 movwf tecla
+                      00157 
+                      00158                 ;cambio entradas por salidas en PORTB
+                      00159                                 ;Banco 2
+0060   1303           00160                                 bcf STATUS,RP1
+0061   1683           00161                                 bsf STATUS,RP0
+                      00162 
+                      00163                                 ;Mitad entradas(1) mitad salidas(0) al revez
+0062   300F           00164                                 movlw 0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0063   0086           00165                                 movwf TRISB
+                      00166 
+                      00167                                 ;Banco 0
+0064   1283           00168                                 bcf STATUS,RP0
+0065   1303           00169                                 bcf STATUS,RP1
+                      00170 
+                      00171                                 ;PORT B mitad en alto(entradas) y mitad el bajo(salidas)
+0066   300F           00172                                 movlw 0x0F
+0067   0086           00173                                 movwf PORTB
+                      00174 
+                      00175                 ;Hago XOR con 0xF0 para ver que valor a cambiado nivle bajo
+0068   300F           00176                 movlw 0x0F
+0069   0606           00177                 xorwf PORTB,W
+                      00178 
+                      00179                 ;Hago OR con tecla para tener en tecla los bits que se an presionado
+006A   04A0           00180                 iorwf tecla,F
+                      00181         
+006B   30FF           00182                 movlw 0xFF
+006C   0087           00183                 movwf PORTC     
+                      00184 
+006D   3003           00185                 movlw 0x03
+006E   00A7           00186                 movwf cont3_pausa
+006F                  00187 PAUSA
+Message[305]: Using default destination of 1 (file).
+006F   0BA5           00188                 decfsz cont1_pausa
+0070   286F           00189                 goto PAUSA
+Message[305]: Using default destination of 1 (file).
+0071   0BA6           00190                 decfsz cont2_pausa
+0072   286F           00191                 goto PAUSA
+Message[305]: Using default destination of 1 (file).
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0073   0BA7           00192                 decfsz cont3_pausa
+0074   286F           00193                 goto PAUSA
+                      00194 
+0075   01A5           00195                 clrf cont1_pausa
+0076   01A6           00196                 clrf cont2_pausa
+                      00197 
+                      00198 
+                      00199                 ;Comparo de uno en uno los posibles valores para tecla
+                      00200                 
+                      00201                         ;Tecla 16(MAS)
+0077   3088           00202                 movlw 0x88
+0078   0620           00203                 xorwf tecla,W
+0079   1903           00204                 btfsc STATUS,Z
+007A   28C3           00205                 goto FIN_PREGUNTA
+                      00206                 
+                      00207                 ;Tecla 12(MENOS)
+007B   0AA1           00208                 incf num_tecla,F
+007C   3084           00209                 movlw 0x84
+007D   0620           00210                 xorwf tecla,W
+007E   1903           00211                 btfsc STATUS,Z
+007F   28C3           00212                 goto FIN_PREGUNTA
+                      00213                 
+                      00214                 ;Tecla 8(POR)
+0080   0AA1           00215                 incf num_tecla,F
+0081   3082           00216                 movlw 0x82
+0082   0620           00217                 xorwf tecla,W
+0083   1903           00218                 btfsc STATUS,Z
+0084   28C3           00219                 goto FIN_PREGUNTA
+                      00220                 
+                      00221                 ;Tecla 4(DIVIDIDO)
+0085   0AA1           00222                 incf num_tecla,F
+0086   3081           00223                 movlw 0x81
+0087   0620           00224                 xorwf tecla,W
+0088   1903           00225                 btfsc STATUS,Z
+0089   28C3           00226                 goto FIN_PREGUNTA
+                      00227                 
+                      00228                 ;Tecla 15(IGUAL)
+008A   0AA1           00229                 incf num_tecla,F
+008B   3048           00230                 movlw 0x48
+008C   0620           00231                 xorwf tecla,W
+008D   1903           00232                 btfsc STATUS,Z
+008E   28C3           00233                 goto FIN_PREGUNTA
+                      00234         
+                      00235                 ;Tecla 11(numero 3)
+008F   0AA1           00236                 incf num_tecla,F
+0090   3044           00237                 movlw 0x44
+0091   0620           00238                 xorwf tecla,W
+0092   1903           00239                 btfsc STATUS,Z
+0093   28C3           00240                 goto FIN_PREGUNTA
+                      00241                 
+                      00242                 ;Tecla 7(numero 6)
+0094   0AA1           00243                 incf num_tecla,F
+0095   3042           00244                 movlw 0x42
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0096   0620           00245                 xorwf tecla,W
+0097   1903           00246                 btfsc STATUS,Z
+0098   28C3           00247                 goto FIN_PREGUNTA
+                      00248                 
+                      00249                 ;Tecla 3(numero 9)
+0099   0AA1           00250                 incf num_tecla,F
+009A   3041           00251                 movlw 0x41
+009B   0620           00252                 xorwf tecla,W
+009C   1903           00253                 btfsc STATUS,Z
+009D   28C3           00254                 goto FIN_PREGUNTA
+                      00255                 
+                      00256                 ;Tecla 14(numero 0)
+009E   0AA1           00257                 incf num_tecla,F
+009F   3028           00258                 movlw 0x28
+00A0   0620           00259                 xorwf tecla,W
+00A1   1903           00260                 btfsc STATUS,Z
+00A2   28C3           00261                 goto FIN_PREGUNTA
+                      00262                 
+                      00263                 ;Tecla 10(numero 2)
+00A3   0AA1           00264                 incf num_tecla,F
+00A4   3024           00265                 movlw 0x24
+00A5   0620           00266                 xorwf tecla,W
+00A6   1903           00267                 btfsc STATUS,Z
+00A7   28C3           00268                 goto FIN_PREGUNTA
+                      00269 
+                      00270                 ;Tecla 6(numero 5)
+00A8   0AA1           00271                 incf num_tecla,F
+00A9   3022           00272                 movlw 0x22
+00AA   0620           00273                 xorwf tecla,W
+00AB   1903           00274                 btfsc STATUS,Z
+00AC   28C3           00275                 goto FIN_PREGUNTA
+                      00276                 
+                      00277                 ;Tecla 2(numero 8)
+00AD   0AA1           00278                 incf num_tecla,F
+00AE   3021           00279                 movlw 0x21
+00AF   0620           00280                 xorwf tecla,W
+00B0   1903           00281                 btfsc STATUS,Z
+00B1   28C3           00282                 goto FIN_PREGUNTA
+                      00283         
+                      00284                 ;Tecla 13(ON OFF)
+00B2   0AA1           00285                 incf num_tecla,F
+00B3   3018           00286                 movlw 0x18
+00B4   0620           00287                 xorwf tecla,W
+00B5   1903           00288                 btfsc STATUS,Z
+00B6   28C3           00289                 goto FIN_PREGUNTA
+                      00290                 
+                      00291                 ;Tecla 9(numero 1)
+00B7   0AA1           00292                 incf num_tecla,F
+00B8   3014           00293                 movlw 0x14
+00B9   0620           00294                 xorwf tecla,W
+00BA   1903           00295                 btfsc STATUS,Z
+00BB   28C3           00296                 goto FIN_PREGUNTA
+                      00297                 
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00298                 ;Tecla 5(numero 4)
+00BC   0AA1           00299                 incf num_tecla,F
+00BD   3012           00300                 movlw 0x12
+00BE   0620           00301                 xorwf tecla,W
+00BF   1903           00302                 btfsc STATUS,Z
+00C0   28C3           00303                 goto FIN_PREGUNTA
+                      00304                 
+                      00305                 ;Tecla 1(numero 7)
+00C1   0AA1           00306                 incf num_tecla,F
+00C2   28C3           00307                 goto FIN_PREGUNTA
+                      00308                 
+                      00309                 
+                      00310         
+                      00311 
+00C3                  00312 FIN_PREGUNTA
+                      00313 
+                      00314 ;recorro los datos de la pantalla de displays
+                      00315 
+                      00316         ;recorro el display 5 al 6
+00C3   082D           00317         movfw display5
+00C4   00AF           00318         movwf display6
+                      00319         ;recorro el display 4 al 5
+00C5   082C           00320         movfw display4
+00C6   00AD           00321         movwf display5
+                      00322         ;recorro el display 3 al 4
+00C7   082B           00323         movfw display3
+00C8   00AC           00324         movwf display4
+                      00325         ;recorro el display 2 al 3
+00C9   082A           00326         movfw display2
+00CA   00AB           00327         movwf display3
+                      00328         ;recorro el display 1 al 2
+00CB   0829           00329         movfw display1
+00CC   00AA           00330         movwf display2
+                      00331         
+                      00332 
+                      00333 ;Cargamos en el display1 el valor segun nuestra tabla   
+                      00334 
+00CD   20DC           00335         call TABLA_DIGITOS
+00CE   00A4           00336         movwf ayuda     
+00CF   0924           00337         comf ayuda,W    
+00D0   00A9           00338         movwf display1
+00D1   28EE           00339         goto RETARDO
+                      00340                 
+                      00341 
+00D2                  00342 TABLA_POSICIONES
+                      00343                 ;Incremento la posicion de barrido de display de tecla al PCL
+00D2   0828           00344                 movf contador_barrido_display,W
+00D3   0782           00345                 addwf PCL,f
+                      00346 
+00D4   3420           00347                 retlw 0x20              ;valor posicion 1
+00D5   3410           00348                 retlw 0x10              ;valor posicion 2
+00D6   3408           00349                 retlw 0x08              ;valor posicion 3
+00D7   3404           00350                 retlw 0x04              ;valor posicion 4
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00D8   3402           00351                 retlw 0x02              ;valor posicion 5
+00D9   3401           00352                 retlw 0x01              ;valor posicion 6
+00DA   01A8           00353                 clrf contador_barrido_display
+00DB   3420           00354                 retlw 0x20
+                      00355                          
+                      00356 
+                      00357 
+00DC                  00358 TABLA_DIGITOS
+                      00359                 ;Incremento el numero de tecla al PCL
+00DC   0821           00360                 movf num_tecla,W
+00DD   0782           00361                 addwf PCL,f 
+                      00362         
+                      00363                 ;tabla con numeros segun la tecla
+                      00364 
+                      00365                 ;Columna 4 de abajo hacia arriba
+00DE   340E           00366                 retlw 0xE               ; valor para mas
+00DF   3401           00367                 retlw 0x01              ; valor para menos
+00E0   3437           00368                 retlw 0x37              ; valor para por
+00E1   3449           00369                 retlw 0x49              ; valor para dividiendo
+                      00370                 ;Columna 3 de abajo hacia arriba
+00E2   3405           00371                 retlw 0x05              ; valor para igual
+00E3   344F           00372                 retlw 0x4F              ; 3 en código 7 segmentos
+00E4   347D           00373                 retlw 0x7D              ; 6 en código 7 segmentos
+00E5   346F           00374                 retlw 0x6F              ; 9 en código 7 segmentos
+                      00375                 ;Columna 2 de abajo hacia arriba
+00E6   343F           00376                 retlw 0x3F              ; 0 en código 7 segmentos       
+00E7   345B           00377                 retlw 0x5B              ; 2 en código 7 segmentos
+00E8   346D           00378                 retlw 0x6D              ; 5 en código 7 segmentos
+00E9   347F           00379                 retlw 0x7F              ; 8 en código 7 segmentos
+                      00380                 ;Columna 1 de abajo hacia arriba
+00EA   3464           00381                 retlw 0x64              ; valor para on/off
+00EB   3406           00382                 retlw 0x06              ; 1 en código 7 segmentos               
+00EC   3466           00383                 retlw 0x66              ; 4 en código 7 segmentos       
+00ED   3407           00384                 retlw 0x07              ; 7 en código 7 segmentos
+                      00385                 
+                      00386 
+00EE                  00387 RETARDO
+                      00388                 ;retardo de 0.5 segundos aprox
+Message[305]: Using default destination of 1 (file).
+00EE   0BA5           00389                 decfsz cont1_pausa
+00EF   28EE           00390                 goto RETARDO
+                      00391         ;       decfsz cont2_pausa
+                      00392         ;       goto RETARDO
+                      00393         ;       decfsz cont3_pausa
+                      00394         ;       goto RETARDO
+00F0   01A5           00395                 clrf cont1_pausa
+00F1   3008           00396                 movlw 0x08
+00F2   00A6           00397                 movwf cont2_pausa
+                      00398         
+00F3   30FF           00399                 movlw 0xFF
+00F4   0087           00400                 movwf PORTC     
+                      00401 
+00F5   01A5           00402                 clrf cont1_pausa
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00F6   01A6           00403                 clrf cont2_pausa
+                      00404         
+                      00405                 ;Banco 2
+00F7   1303           00406                 bcf STATUS,RP1
+00F8   1683           00407                 bsf STATUS,RP0
+                      00408 
+                      00409                 ;Mitad entradas(1) mitad salidas(0)
+00F9   30F0           00410                 movlw 0xF0
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00FA   0086           00411                 movwf TRISB
+                      00412         
+                      00413                 ;Banco 0
+00FB   1283           00414                 bcf STATUS,RP0
+00FC   1303           00415                 bcf STATUS,RP1
+                      00416                 
+                      00417                 
+                      00418                 ;PORT B mitad en alto(entradas) y mitad el bajo(salidas)
+00FD   30F0           00419                 movlw 0xF0
+00FE   0086           00420                 movwf PORTB
+                      00421 
+00FF   2830           00422                 goto BARRIDO_DISPLAY
+                      00423         
+                      00424                 
+                      00425 
+Warning[205]: Found directive in column 1. (END)
+                      00426 END
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ABDEN                             00000000
+ABDOVF                            00000007
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+ANS0                              00000000
+ANS1                              00000001
+ANS10                             00000002
+ANS11                             00000003
+ANS12                             00000004
+ANS13                             00000005
+ANS2                              00000002
+ANS3                              00000003
+ANS4                              00000004
+ANS5                              00000005
+ANS6                              00000006
+ANS7                              00000007
+ANS8                              00000000
+ANS9                              00000001
+ANSEL                             00000188
+ANSELH                            00000189
+BARRIDO_DISPLAY                   00000030
+BAUDCTL                           00000187
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRG0                              00000000
+BRG1                              00000001
+BRG10                             00000002
+BRG11                             00000003
+BRG12                             00000004
+BRG13                             00000005
+BRG14                             00000006
+BRG15                             00000007
+BRG16                             00000003
+BRG2                              00000002
+BRG3                              00000003
+BRG4                              00000004
+BRG5                              00000005
+BRG6                              00000006
+BRG7                              00000007
+BRG8                              00000000
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 11
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+BRG9                              00000001
+BRGH                              00000002
+C                                 00000000
+C1CH0                             00000000
+C1CH1                             00000001
+C1IE                              00000005
+C1IF                              00000005
+C1OE                              00000005
+C1ON                              00000007
+C1OUT                             00000006
+C1POL                             00000004
+C1R                               00000002
+C1RSEL                            00000005
+C1SEN                             00000005
+C2CH0                             00000000
+C2CH1                             00000001
+C2IE                              00000006
+C2IF                              00000006
+C2OE                              00000005
+C2ON                              00000007
+C2OUT                             00000006
+C2POL                             00000004
+C2R                               00000002
+C2REN                             00000004
+C2RSEL                            00000004
+C2SYNC                            00000000
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000002
+CHS1                              00000003
+CHS2                              00000004
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CHS3                              00000005
+CKE                               00000006
+CKP                               00000004
+CM1CON0                           00000107
+CM2CON0                           00000108
+CM2CON1                           00000109
+CREN                              00000004
+CSRC                              00000007
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DC1B0                             00000004
+DC1B1                             00000005
+DC2B0                             00000004
+DC2B1                             00000005
+DISPLAY2                          0000003B
+DISPLAY3                          00000042
+DISPLAY4                          00000049
+DISPLAY5                          00000050
+DISPLAY6                          00000057
+D_A                               00000005
+D_NOT_A                           00000005
+ECCPAS                            0000009C
+ECCPAS0                           00000004
+ECCPAS1                           00000005
+ECCPAS2                           00000006
+ECCPASE                           00000007
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDAT                             0000010C
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FIN_PREGUNTA                      000000C3
+FSR                               00000004
+FVREN                             00000000
+GCEN                              00000007
+GIE                               00000007
+GO                                00000001
+GO_DONE                           00000001
+GO_NOT_DONE                       00000001
+HTS                               00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+INDF                              00000000
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+INICIO                            00000010
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IOCB                              00000096
+IOCB0                             00000000
+IOCB1                             00000001
+IOCB2                             00000002
+IOCB3                             00000003
+IOCB4                             00000004
+IOCB5                             00000005
+IOCB6                             00000006
+IOCB7                             00000007
+IRCF0                             00000004
+IRCF1                             00000005
+IRCF2                             00000006
+IRP                               00000007
+LTS                               00000001
+MC1OUT                            00000007
+MC2OUT                            00000006
+MSK                               00000093
+MSK0                              00000000
+MSK1                              00000001
+MSK2                              00000002
+MSK3                              00000003
+MSK4                              00000004
+MSK5                              00000005
+MSK6                              00000006
+MSK7                              00000007
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000001
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OERR                              00000001
+OPTION_REG                        00000081
+OSCCON                            0000008F
+OSCTUNE                           00000090
+OSFIE                             00000007
+OSFIF                             00000007
+OSTS                              00000003
+P                                 00000004
+P1M0                              00000006
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+P1M1                              00000007
+PASO2                             0000005F
+PAUSA                             0000006F
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PDC0                              00000000
+PDC1                              00000001
+PDC2                              00000002
+PDC3                              00000003
+PDC4                              00000004
+PDC5                              00000005
+PDC6                              00000006
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PRSEN                             00000007
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSSAC0                            00000002
+PSSAC1                            00000003
+PSSBD0                            00000000
+PSSBD1                            00000001
+PSTRCON                           0000009D
+PULSR                             00000002
+PULSS                             00000003
+PWM1CON                           0000009B
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RA6                               00000006
+RA7                               00000007
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIDL                             00000006
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+RE3                               00000003
+READ_WRITE                        00000002
+RETARDO                           000000EE
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SBOREN                            00000004
+SCKP                              00000004
+SCS                               00000000
+SEN                               00000000
+SENDB                             00000003
+SIGUIENTE_DISPLAY                 00000059
+SMP                               00000007
+SPBRG                             00000099
+SPBRGH                            0000009A
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+SPEN                              00000007
+SR0                               00000006
+SR1                               00000007
+SRCON                             00000185
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPMSK                            00000093
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+STRA                              00000000
+STRB                              00000001
+STRC                              00000002
+STRD                              00000003
+STRSYNC                           00000004
+SWDTEN                            00000000
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1GINV                            00000007
+T1GIV                             00000007
+T1GSS                             00000001
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TABLA_DIGITOS                     000000DC
+TABLA_POSICIONES                  000000D2
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1GE                            00000006
+TMR1H                             0000000F
+TMR1IE                            00000000
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISA6                            00000006
+TRISA7                            00000007
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRISE3                            00000003
+TRMT                              00000001
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TUN0                              00000000
+TUN1                              00000001
+TUN2                              00000002
+TUN3                              00000003
+TUN4                              00000004
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+ULPWUE                            00000005
+ULPWUIE                           00000002
+ULPWUIF                           00000002
+VCFG0                             00000004
+VCFG1                             00000005
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             00000097
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+VRSS                              00000004
+W                                 00000000
+WCOL                              00000007
+WDTCON                            00000105
+WDTPS0                            00000001
+WDTPS1                            00000002
+WDTPS2                            00000003
+WDTPS3                            00000004
+WPUB                              00000095
+WPUB0                             00000000
+WPUB1                             00000001
+WPUB2                             00000002
+WPUB3                             00000003
+WPUB4                             00000004
+WPUB5                             00000005
+WPUB6                             00000006
+WPUB7                             00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+WUE                               00000001
+Z                                 00000002
+_BOR21V                           00003EFF
+_BOR40V                           00003FFF
+_BOR4V_BOR21V                     00003EFF
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_BOR4V_BOR40V                     00003FFF
+_BOREN_NSLEEP                     00003EFF
+_BOREN_OFF                        00003CFF
+_BOREN_ON                         00003FFF
+_BOREN_SBODEN                     00003DFF
+_BOR_NSLEEP                       00003EFF
+_BOR_OFF                          00003CFF
+_BOR_ON                           00003FFF
+_BOR_SBODEN                       00003DFF
+_CONFIG1                          00002007
+_CONFIG2                          00002008
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003F7F
+_CP_OFF                           00003FFF
+_CP_ON                            00003FBF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         00001FFF
+_DEVID1                           00002006
+_EC_OSC                           00003FFB
+_EXTRC                            00003FFF
+_EXTRCIO                          00003FFE
+_EXTRC_OSC_CLKOUT                 00003FFF
+_EXTRC_OSC_NOCLKOUT               00003FFE
+_FCMEN_OFF                        000037FF
+_FCMEN_ON                         00003FFF
+_FOSC_EC                          00003FFB
+_FOSC_EXTRC_CLKOUT                00003FFF
+_FOSC_EXTRC_NOCLKOUT              00003FFE
+_FOSC_HS                          00003FFA
+_FOSC_INTRC_CLKOUT                00003FFD
+_FOSC_INTRC_NOCLKOUT              00003FFC
+_FOSC_LP                          00003FF8
+_FOSC_XT                          00003FF9
+_HS_OSC                           00003FFA
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_IESO_OFF                         00003BFF
+_IESO_ON                          00003FFF
+_INTOSC                           00003FFD
+_INTOSCIO                         00003FFC
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FF8
+_LVP_OFF                          00002FFF
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FEF
+_WDTE_OFF                         00003FF7
+_WDTE_ON                          00003FFF
+MPASM  5.49             KS TECLADO Y LEDS.ASM   5-13-2013  17:46:27         PAGE 20
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_OFF                          00003FF7
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FF9
+__16F887                          00000001
+__DEBUG                           1
+ayuda                             00000024
+barrido_display                   00000022
+cont1_pausa                       00000025
+cont2_pausa                       00000026
+cont3_pausa                       00000027
+contador_barrido_display          00000028
+display1                          00000029
+display2                          0000002A
+display3                          0000002B
+display4                          0000002C
+display5                          0000002D
+display6                          0000002F
+num_tecla                         00000021
+tecla                             00000020
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X--------------- XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+00C0 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+
+All other memory blocks unused.
+
+Program Memory Words Used:   241
+Program Memory Words Free:  7951
+
+
+Errors   :     0
+Warnings :     4 reported,     0 suppressed
+Messages :    11 reported,     0 suppressed
+
+
